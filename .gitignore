@@ -57,5 +57,3 @@ typings/
 # dotenv environment variables file
 .env
 
-# Persistent data for docker image with Hass.io addon
-data/

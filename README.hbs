@@ -1,0 +1,92 @@
+# Gree HVAC client
+
+A client for communicating with Gree air conditioners.
+
+## Requirements
+
+- NodeJS (>=8.11.0)
+
+## Installation
+
+`yarn add gree-hvac-client`
+
+or
+
+`npm install --save gree-hvac-client`
+
+
+## Simple usage
+
+Set device properties:
+
+```javascript
+const Gree = require('gree-hvac-client');
+
+const client = new Gree.Client({host: '192.168.7.60'});
+
+client.on('connect', () => {
+    client.setProperty(Gree.PROPERTY.temperature, 25);
+    client.setProperty(Gree.PROPERTY.lights, Gree.VALUE.lights.off);
+});
+```
+
+
+Poll device properties:
+
+```javascript
+const Gree = require('gree-hvac-client');
+
+const client = new Gree.Client({host: '192.168.7.60'});
+
+client.on('connect', (client) => {
+    console.log('connected to', client.getDeviceId());
+});
+client.on('update', (updatedProperties, properties) => {
+    console.log(updatedProperties, properties);
+});
+
+```
+
+## Properties
+
+| Command | Values | Description |
+|-|-|-|
+| **temperature** | any integer |In degrees Celsius by default |
+| **mode** | _off_, _auto_, _cool_, _heat_, _dry_, _fan_only_|Operation mode |
+| **fanspeed** | _auto_, _low_, _mediumLow_, _medium_, _mediumHigh_, _high_ | Fan speed |
+| **swinghor** | _default_, _full_, _fixedLeft_, _fixedMidLeft_, _fixedMid_, _fixedMidRight_, _fixedRight_ | Horizontal Swing |
+| **swingvert** | _default_, _full_, _fixedTop_, _fixedMidTop_, _fixedMid_, _fixedMidBottom_, _fixedBottom_, _swingBottom_, _swingMidBottom_, _swingMid_, _swingMidTop_, _swingTop_ | Vetical swing |
+| **power** | _off_, _on_ | Turn device on/off |
+| **health** | _off_, _on_ | Health ("Cold plasma") mode, only for devices equipped with "anion generator", which absorbs dust and kills bacteria |
+| **powersave** | _off_, _on_ | Power Saving mode |
+| **lights** | _off_, _on_ | Turn on/off device lights |
+| **quiet** | _off_, _mode1_, _mode2_, _mode3_ | Quiet modes |
+| **blow** | _off_, _on_ | Keeps the fan running for a while after shutting down (also called "X-Fan", only usable in Dry and Cool mode) |
+| **air** | _off_, _inside_, _outside_, _mode3_ | Fresh air valve |
+| **sleep** | _off_, _on_ | Sleep mode |
+| **turbo** | _off_, _on_ | Turbo mode |
+
+## Configuring HVAC WiFi
+
+1. Make sure your HVAC is running in AP mode. You can reset the WiFi config by pressing MODE +WIFI (or MODE + TURBO) on the AC remote for 5s.
+2. Connect with the AP wifi network (the SSID name should be a 8-character alfanumeric, e.g. "u34k5l166").
+3. Run the following in your UNIX terminal:
+
+```shell
+echo -n "{\"psw\": \"YOUR_WIFI_PASSWORD\",\"ssid\": \"YOUR_WIFI_SSID\",\"t\": \"wlan\"}" | nc -cu 192.168.1.1 7000
+````
+
+## API Reference
+{{>main}}
+
+Note: This command may vary depending on your OS (e.g. Linux, macOS, CygWin). If facing problems, please consult the appropriate netcat manual.
+
+## License
+
+This project is licensed under the GNU GPLv3 - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+- [tomikaa87](https://github.com/tomikaa87) for reverse-engineering the Gree protocol
+- [oroce](https://github.com/oroce) for inspiration
+- [arthurkrupa](https://github.com/arthurkrupa) for inspiration
