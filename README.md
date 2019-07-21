@@ -76,6 +76,8 @@ client.on('update', (updatedProperties, properties) => {
 echo -n "{\"psw\": \"YOUR_WIFI_PASSWORD\",\"ssid\": \"YOUR_WIFI_SSID\",\"t\": \"wlan\"}" | nc -cu 192.168.1.1 7000
 ````
 
+Note: This command may vary depending on your OS (e.g. Linux, macOS, CygWin). If facing problems, please consult the appropriate netcat manual.
+
 ## API Reference
 ## Classes
 
@@ -323,8 +325,6 @@ Device properties constants
 | turbo | <code>string</code> | Sets fan speed to the maximum. Fan speed cannot be changed while active and only available in Dry and Cool mode |
 | powerSave | <code>string</code> | Power saving mode |
 
-
-Note: This command may vary depending on your OS (e.g. Linux, macOS, CygWin). If facing problems, please consult the appropriate netcat manual.
 
 ## License
 
