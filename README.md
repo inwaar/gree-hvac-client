@@ -44,6 +44,9 @@ client.on('connect', (client) => {
 client.on('update', (updatedProperties, properties) => {
     console.log(updatedProperties, properties);
 });
+client.on('no_response', () => {
+    console.log('no response');
+});
 
 ```
 
@@ -230,6 +233,7 @@ Client options
 | autoConnect | <code>boolean</code> | <code>true</code> | Automatically connect to device when client is created. Alternatively method `connect()` can be used. |
 | poll | <code>boolean</code> | <code>true</code> | Poll device properties |
 | pollingInterval | <code>number</code> | <code>3000</code> | Device properties polling interval |
+| pollingTimeout | <code>number</code> | <code>1000</code> | Device properties polling timeout, emits `no_response` events in case of no response from HVAC device for a status request |
 | debug | <code>boolean</code> | <code>false</code> | Trace debug information |
 
 <a name="PROPERTY_VALUE"></a>

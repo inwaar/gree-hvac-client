@@ -11,3 +11,9 @@ client.on('connect', (client) => {
 client.on('update', (updatedProperties, properties) => {
     console.log(updatedProperties, properties);
 });
+client.on('disconnect', () => {
+    console.log('disconnect');
+});
+client.on('no_response', () => {
+    console.log('no_response');
+});
