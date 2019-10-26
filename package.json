@@ -16,10 +16,6 @@
   "engines": {
     "node": ">=8.11.0"
   },
-  "os": [
-    "darwin",
-    "linux"
-  ],
   "devDependencies": {
     "jsdoc-to-markdown": "^5.0.0",
     "mocha": "^6.2.0"
