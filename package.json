@@ -1,6 +1,6 @@
 {
   "name": "gree-hvac-client",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A client for controlling Gree smart air conditioners",
   "scripts": {
     "test": "mocha",
