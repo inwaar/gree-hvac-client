@@ -7,12 +7,14 @@ describe('PropertyTransformer', function () {
             const SUT = new PropertyTransformer();
             const result = SUT.fromVendor({
                 Mod: 1,
-                SetTem: 25
+                SetTem: 25,
+                TemSen: 27,
             });
 
             assert.deepEqual(result, {
                 mode: 'cool',
-                temperature: 25
+                temperature: 25,
+                currentTemperature: 27
             });
         });
     });
