@@ -8,7 +8,7 @@ describe('PropertyTransformer', function () {
             const result = SUT.fromVendor({
                 Mod: 1,
                 SetTem: 25,
-                TemSen: 27,
+                TemSen: 67,
             });
 
             assert.deepEqual(result, {
@@ -29,6 +29,17 @@ describe('PropertyTransformer', function () {
             assert.deepEqual(result, {
                 Mod: 1,
                 SetTem: 25
+            });
+        });
+        it('should not allow to change read-only property', function () {
+            const SUT = new PropertyTransformer();
+            assert.throws(() => {
+                SUT.toVendor({
+                    currentTemperature: 30
+                })
+            }, {
+                name: 'Error',
+                message: 'Cannot set read-only property currentTemperature'
             });
         });
     });
