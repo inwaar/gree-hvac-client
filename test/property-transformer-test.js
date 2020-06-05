@@ -17,6 +17,17 @@ describe('PropertyTransformer', function () {
                 currentTemperature: 27
             });
         });
+
+        it('should not subtract 40 from vendor value in case of zero', function () {
+            const SUT = new PropertyTransformer();
+            const result = SUT.fromVendor({
+                TemSen: 0
+            });
+
+            assert.deepEqual(result, {
+                currentTemperature: 0
+            });
+        });
     });
     describe('#toVendor()', function () {
         it('should transform from human friendly to vendor', function () {
