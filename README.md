@@ -55,6 +55,7 @@ client.on('no_response', () => {
 | Command | Values | Description |
 |-|-|-|
 | **temperature** | any integer |In degrees Celsius by default |
+| **currentTemperature** | any integer |In degrees Celsius by default. (Read-only) |
 | **mode** | _auto_, _cool_, _heat_, _dry_, _fan_only_|Operation mode |
 | **fanspeed** | _auto_, _low_, _mediumLow_, _medium_, _mediumHigh_, _high_ | Fan speed |
 | **swinghor** | _default_, _full_, _fixedLeft_, _fixedMidLeft_, _fixedMid_, _fixedMidRight_, _fixedRight_ | Horizontal Swing |
