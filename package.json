@@ -3,6 +3,7 @@
   "version": "1.3.1",
   "description": "A client for controlling Gree smart air conditioners",
   "scripts": {
+    "lint": "eslint ./",
     "test": "mocha",
     "docs": "jsdoc2md -t README.hbs lib/*.js  > README.md; echo"
   },
@@ -17,8 +18,12 @@
     "node": ">=8.11.0"
   },
   "devDependencies": {
+    "eslint": ">=8.27.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "jsdoc-to-markdown": "^5.0.3",
-    "mocha": "^7.1.1"
+    "mocha": "^7.1.1",
+    "prettier": "^2.8.0"
   },
   "repository": {
     "type": "git",
