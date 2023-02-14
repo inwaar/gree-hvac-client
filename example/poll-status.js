@@ -5,7 +5,7 @@ const client = new Gree.Client({
     debug: false,
 });
 
-client.on('connect', (client) => {
+client.on('connect', client => {
     console.log('connected to', client.getDeviceId());
 });
 client.on('update', (updatedProperties, properties) => {
