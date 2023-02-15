@@ -1,10 +1,13 @@
-name: Lint
+name: lint and test
 
-on: [push, pull_request]
-
+on: 
+  - push:
+    branches:
+      - 'dev/**'
+  - pull_request:
+  
 jobs:
-  build:
-
+  ci:
     runs-on: ubuntu-latest
 
     strategy:
