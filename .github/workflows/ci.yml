@@ -1,10 +1,10 @@
 name: lint and test
 
 on: 
-  - push:
+  push:
     branches:
       - 'dev/**'
-  - pull_request:
+  pull_request:
   
 jobs:
   ci:
