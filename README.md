@@ -86,7 +86,7 @@ Note: This command may vary depending on your OS (e.g. Linux, macOS, CygWin). If
 ## Classes
 
 <dl>
-<dt><a href="#Client">Client</a></dt>
+<dt><a href="#Client">Client</a> ⇐ <code>EventEmitter</code></dt>
 <dd><p>Control GREE HVAC device by getting and setting its properties</p>
 </dd>
 </dl>
@@ -105,14 +105,23 @@ Note: This command may vary depending on your OS (e.g. Linux, macOS, CygWin). If
 </dd>
 </dl>
 
+## Typedefs
+
+<dl>
+<dt><a href="#PropertyMap">PropertyMap</a> : <code>Object.&lt;PROPERTY, (PROPERTY_VALUE|number)&gt;</code></dt>
+<dd></dd>
+</dl>
+
 <a name="Client"></a>
 
-## Client
+## Client ⇐ <code>EventEmitter</code>
 Control GREE HVAC device by getting and setting its properties
 
 **Kind**: global class  
+**Extends**: <code>EventEmitter</code>  
+**Emits**: [<code>connect</code>](#Client+event_connect), [<code>update</code>](#Client+event_update)  
 
-* [Client](#Client)
+* [Client](#Client) ⇐ <code>EventEmitter</code>
     * [new Client(options)](#new_Client_new)
     * [.connect()](#Client+connect)
     * [.disconnect()](#Client+disconnect)
@@ -120,6 +129,9 @@ Control GREE HVAC device by getting and setting its properties
     * [.setProperty(property, value)](#Client+setProperty)
     * [.getDeviceId()](#Client+getDeviceId) ⇒ <code>string</code> \| <code>null</code>
     * [.setDebug(enable)](#Client+setDebug)
+    * ["connect"](#Client+event_connect)
+    * ["success" (updated, properties)](#Client+event_success)
+    * ["update" (updated, properties)](#Client+event_update)
 
 <a name="new_Client_new"></a>
 
@@ -147,6 +159,7 @@ client.on('connect', () => {
 Connect to a HVAC device and start polling status changes by default
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
+**Emits**: [<code>connect</code>](#Client+event_connect)  
 <a name="Client+disconnect"></a>
 
 ### client.disconnect()
@@ -159,10 +172,11 @@ Disconnect from a HVAC device and stop status polling
 Set a list of device properties at once by one request
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
+**Emits**: [<code>success</code>](#Client+event_success)  
 
 | Param | Type |
 | --- | --- |
-| properties | <code>Object.&lt;PROPERTY, PROPERTY\_VALUE&gt;</code> | 
+| properties | [<code>PropertyMap</code>](#PropertyMap) | 
 
 **Example**  
 ```js
@@ -192,6 +206,7 @@ client.setProperties({
 Set device property
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
+**Emits**: [<code>success</code>](#Client+event_success)  
 
 | Param | Type |
 | --- | --- |
@@ -228,6 +243,36 @@ Set debug level
 | Param | Type |
 | --- | --- |
 | enable | <code>Boolean</code> | 
+
+<a name="Client+event_connect"></a>
+
+### "connect"
+Emitted when successfully connected to the HVAC
+
+**Kind**: event emitted by [<code>Client</code>](#Client)  
+<a name="Client+event_success"></a>
+
+### "success" (updated, properties)
+Emitted when properties successfully updated after calling setProperties or setProperty
+
+**Kind**: event emitted by [<code>Client</code>](#Client)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| updated | [<code>PropertyMap</code>](#PropertyMap) | The properties and their values that were updated |
+| properties | [<code>PropertyMap</code>](#PropertyMap) | All the properties and their values managed by the Client |
+
+<a name="Client+event_update"></a>
+
+### "update" (updated, properties)
+Emitted when properties successfully updated from HVAC (e.g. by a remote control)
+
+**Kind**: event emitted by [<code>Client</code>](#Client)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| updated | [<code>PropertyMap</code>](#PropertyMap) | The properties and their values that were updated |
+| properties | [<code>PropertyMap</code>](#PropertyMap) | All the properties and their values managed by the Client |
 
 <a name="CLIENT_OPTIONS"></a>
 
@@ -345,6 +390,10 @@ Device properties constants
 | turbo | <code>string</code> | Sets fan speed to the maximum. Fan speed cannot be changed while active and only available in Dry and Cool mode |
 | powerSave | <code>string</code> | Power saving mode |
 
+<a name="PropertyMap"></a>
+
+## PropertyMap : <code>Object.&lt;PROPERTY, (PROPERTY\_VALUE\|number)&gt;</code>
+**Kind**: global typedef  
 
 ## License
 
