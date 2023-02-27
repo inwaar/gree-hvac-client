@@ -17,3 +17,6 @@ client.on('disconnect', () => {
 client.on('no_response', () => {
     console.log('no_response');
 });
+client.on('error', error => {
+    console.error(error);
+});
