@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "Igor Starovierov <igor.decler@gmail.com>",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "dependencies": {
     "clone": "^2.1.2",
     "object-diff": "^0.0.4"
