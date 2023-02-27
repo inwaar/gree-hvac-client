@@ -116,7 +116,7 @@ Note: This command may vary depending on your OS (e.g. Linux, macOS, CygWin). If
 ## Constants
 
 <dl>
-<dt><a href="#CLIENT_OPTIONS">CLIENT_OPTIONS</a></dt>
+<dt><a href="#CLIENT_OPTIONS">CLIENT_OPTIONS</a> : <code>object</code></dt>
 <dd><p>Client options</p>
 </dd>
 <dt><a href="#PROPERTY_VALUE">PROPERTY_VALUE</a></dt>
@@ -416,7 +416,7 @@ Connecting was cancelled by calling disconnect
 **Extends**: [<code>ClientError</code>](#ClientError)  
 <a name="CLIENT_OPTIONS"></a>
 
-## CLIENT\_OPTIONS
+## CLIENT\_OPTIONS : <code>object</code>
 Client options
 
 **Kind**: global constant  

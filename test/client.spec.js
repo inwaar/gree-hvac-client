@@ -1,4 +1,5 @@
 const assert = require('assert');
+const { EventEmitter } = require('stream');
 
 const { Client } = require('../src/client');
 const {
@@ -8,11 +9,11 @@ const {
     ClientCancelConnectError,
 } = require('../src/errors');
 
-function once(emitter, event) {
-    return new Promise(resolve => {
-        emitter.once(event, resolve);
-    });
-}
+/**
+ * Promisify EventEmitter error events
+ *
+ * @param {EventEmitter} emitter
+ */
 function onceError(emitter) {
     return new Promise((_, reject) => {
         emitter.once('error', reject);

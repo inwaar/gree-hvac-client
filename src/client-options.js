@@ -1,8 +1,10 @@
+/* eslint-disable jsdoc/valid-types */
 'use strict';
 
 /**
  * Client options
  *
+ * @type {object}
  * @readonly
  * @property {string} host=192.168.1.255 - GREE device ip-address
  * @property {number} port=7000 - GREE device UDP port

@@ -1,12 +1,12 @@
 /**
  * @class
- * @extends Error
+ * @augments Error
  */
 class ClientError extends Error {
     /**
      * @param {string} message
      * @param {Error|undefined} origin
-     * @param {Object.<string, unknown>} props
+     * @param {Object<string, unknown>} props
      */
     constructor(message, origin, props) {
         super(message);
@@ -20,7 +20,7 @@ class ClientError extends Error {
  * Connectivity problems while communicating with HVAC
  *
  * @class
- * @extends ClientError
+ * @augments ClientError
  */
 class ClientSocketSendError extends ClientError {
     /**
@@ -35,12 +35,12 @@ class ClientSocketSendError extends ClientError {
  * The message received from HVAC cannot be parsed
  *
  * @class
- * @extends ClientError
+ * @augments ClientError
  */
 class ClientMessageParseError extends ClientError {
     /**
      * @param {Error} cause
-     * @param {Object.<string, unknown>} props
+     * @param {Object<string, unknown>} props
      */
     constructor(cause, props) {
         super(
@@ -55,12 +55,12 @@ class ClientMessageParseError extends ClientError {
  * The package from the message received from HVAC cannot be decrypt
  *
  * @class
- * @extends ClientError
+ * @augments ClientError
  */
 class ClientMessageUnpackError extends ClientError {
     /**
      * @param {Error} cause
-     * @param {Object.<string, unknown>} props
+     * @param {Object<string, unknown>} props
      */
     constructor(cause, props) {
         super(`Can not decrypt message (${cause.message})`, cause, props);
@@ -71,11 +71,11 @@ class ClientMessageUnpackError extends ClientError {
  * A message having an unknown format was received from HVAC
  *
  * @class
- * @extends ClientError
+ * @augments ClientError
  */
 class ClientUnknownMessageError extends ClientError {
     /**
-     * @param {Object.<string, unknown>} props
+     * @param {Object<string, unknown>} props
      */
     constructor(props) {
         super('Unknown message type received', props);
@@ -86,7 +86,7 @@ class ClientUnknownMessageError extends ClientError {
  * Request operations on not connected to the HVAC client
  *
  * @class
- * @extends ClientError
+ * @augments ClientError
  */
 class ClientNotConnectedError extends ClientError {
     constructor() {
@@ -96,7 +96,7 @@ class ClientNotConnectedError extends ClientError {
 
 /**
  * @class
- * @extends ClientError
+ * @augments ClientError
  */
 class ClientConnectTimeoutError extends ClientError {
     constructor() {
@@ -108,7 +108,7 @@ class ClientConnectTimeoutError extends ClientError {
  * Connecting was cancelled by calling disconnect
  *
  * @class
- * @extends ClientError
+ * @augments ClientError
  */
 class ClientCancelConnectError extends ClientError {
     constructor() {

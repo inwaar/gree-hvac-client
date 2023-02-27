@@ -4,7 +4,6 @@
  * Device vendor properties value constants
  *
  * @readonly
- * @private
  * @property {string} power.on
  * @property {string} power.off
  * @property {string} mode.auto
@@ -61,6 +60,7 @@
  * @property {string} powerSave.on
  * @property {string} safetyHeating.off
  * @property {string} safetyHeating.on
+ * @private
  */
 const PROPERTY_VALUE = {
     power: {

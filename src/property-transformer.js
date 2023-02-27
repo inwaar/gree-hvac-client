@@ -47,6 +47,7 @@ const NOOP_PROPERTY_VALUE_TRANSFORMER = {
 
 /**
  * Transforms device properties from vendor names to human friendly names and back
+ *
  * @private
  */
 class PropertyTransformer {
@@ -59,8 +60,9 @@ class PropertyTransformer {
 
     /**
      * Transforms device properties from vendor names to human friendly names
+     *
      * @param properties Object.<string,string|number>
-     * @returns {Object.<string,string|number>}
+     * @returns {Object<string, string | number>}
      * @example
      * const properties = transformer.fromVendor({
      *     Mod: 1,
@@ -88,8 +90,9 @@ class PropertyTransformer {
 
     /**
      * Transforms device properties from human friendly names to vendor names
+     *
      * @param properties Object.<string,string|number>
-     * @returns {Object.<string,string|number>}
+     * @returns {Object<string, string | number>}
      */
     toVendor(properties) {
         let ret = {};

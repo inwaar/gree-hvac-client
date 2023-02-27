@@ -12,6 +12,7 @@ class EncryptionService {
     constructor(key = 'a3K8Bx%2r8Y7#xDh') {
         /**
          * Device crypto-key
+         *
          * @type {string}
          * @private
          */
@@ -34,8 +35,10 @@ class EncryptionService {
 
     /**
      * Decrypt UDP message
+     *
      * @param {object} input Response object
      * @param {string} input.pack Encrypted JSON string
+     * @returns {object}
      */
     decrypt(input) {
         const decipher = crypto.createDecipheriv('aes-128-ecb', this._key, '');
@@ -45,7 +48,9 @@ class EncryptionService {
 
     /**
      * Encrypt UDP message
+     *
      * @param {object} output Request object
+     * @returns {string}
      */
     encrypt(output) {
         const cipher = crypto.createCipheriv('aes-128-ecb', this._key, '');

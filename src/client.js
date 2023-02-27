@@ -23,11 +23,12 @@ const {
 
 /**
  * Control GREE HVAC device by getting and setting its properties
- * @extends EventEmitter
+ *
+ * @augments EventEmitter
  */
 class Client extends EventEmitter {
     /**
-     * @typedef {Object.<PROPERTY, PROPERTY_VALUE|number>} PropertyMap
+     * @typedef {Object<PROPERTY, PROPERTY_VALUE | number>} PropertyMap
      */
 
     /**
@@ -39,17 +40,17 @@ class Client extends EventEmitter {
     /**
      * Emitted when properties successfully updated after calling setProperties or setProperty
      *
-     * @event Client#success
      * @param {PropertyMap} updated The properties and their values that were updated
      * @param {PropertyMap} properties All the properties and their values managed by the Client
+     * @event Client#success
      */
 
     /**
      * Emitted when properties successfully updated from HVAC (e.g. by a remote control)
      *
-     * @event Client#update
      * @param {PropertyMap} updated The properties and their values that were updated
      * @param {PropertyMap} properties All the properties and their values managed by the Client
+     * @event Client#update
      */
 
     /**
@@ -57,8 +58,8 @@ class Client extends EventEmitter {
      *
      * It is important to subscribe to the `error` event, otherwise the process will be terminated
      *
-     * @event Client#error
      * @param {ClientError} error
+     * @event Client#error
      */
 
     /**
@@ -69,13 +70,12 @@ class Client extends EventEmitter {
 
     /**
      * Creates a new client, connect to device and start polling by default.
-     * @param {CLIENT_OPTIONS | {}} options
      *
+     * @param {CLIENT_OPTIONS | {}} options
      * @fires Client#connect
      * @fires Client#update
      * @fires Client#error
      * @fires Client#disconnect
-     *
      * @example
      * const Gree = require('gree-hvac-client');
      *
@@ -179,9 +179,9 @@ class Client extends EventEmitter {
     /**
      * Connect to a HVAC device and start polling status changes by default
      *
+     * @returns {Promise}
      * @fires Client#connect
      * @fires Client#error
-     * @returns {Promise}
      */
     connect() {
         return new Promise((resolve, reject) => {
@@ -240,8 +240,8 @@ class Client extends EventEmitter {
     /**
      * Disconnect from a HVAC device and stop status polling
      *
-     * @fires Client#disconnect
      * @returns {Promise}
+     * @fires Client#disconnect
      */
     disconnect() {
         this._dispose();
@@ -261,6 +261,7 @@ class Client extends EventEmitter {
 
     /**
      * Cancel interval and timeout resources
+     *
      * @private
      */
     _dispose() {
@@ -279,9 +280,9 @@ class Client extends EventEmitter {
      * Set a list of device properties at once by one request
      *
      * @param {PropertyMap} properties
+     * @returns {Promise}
      * @fires Client#success
      * @fires Client#error
-     * @returns {Promise}
      * @example
      * // use library constants
      *
@@ -315,9 +316,9 @@ class Client extends EventEmitter {
      *
      * @param {PROPERTY} property
      * @param {PROPERTY_VALUE} value
+     * @returns {Promise}
      * @fires Client#success
      * @fires Client#error
-     * @returns {Promise}
      * @example
      * // use library constants
      *
