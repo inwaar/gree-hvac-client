@@ -1,12 +1,12 @@
 const assert = require('assert');
 
-const { Client } = require('../lib/client');
+const { Client } = require('../src/client');
 const {
     ClientSocketSendError,
     ClientNotConnectedError,
     ClientConnectTimeoutError,
     ClientCancelConnectError,
-} = require('../lib/errors');
+} = require('../src/errors');
 
 function once(emitter, event) {
     return new Promise(resolve => {

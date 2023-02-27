@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { PropertyTransformer } = require('../lib/property-transformer');
+const { PropertyTransformer } = require('../src/property-transformer');
 
 describe('PropertyTransformer', function () {
     describe('#fromVendor()', function () {

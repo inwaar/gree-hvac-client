@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint ./",
     "test": "mocha",
-    "docs": "jsdoc2md -t README.hbs lib/*.js  > README.md; echo",
+    "docs": "jsdoc2md -t README.hbs src/*.js  > README.md; echo",
     "semantic-release": "semantic-release"
   },
   "keywords": [],
