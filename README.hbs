@@ -4,7 +4,7 @@ A client for communicating with Gree air conditioners.
 
 ## Requirements
 
-- NodeJS (>=8.11.0)
+- NodeJS (>=12)
 
 ## Installation
 
@@ -73,7 +73,7 @@ client.on('no_response', () => {
 ## Configuring HVAC WiFi
 
 1. Make sure your HVAC is running in AP mode. You can reset the WiFi config by pressing MODE +WIFI (or MODE + TURBO) on the AC remote for 5s.
-2. Connect with the AP wifi network (the SSID name should be a 8-character alfanumeric, e.g. "u34k5l166").
+2. Connect with the AP wifi network (the SSID name should be a 8-character alphanumeric, e.g. "u34k5l166").
 3. Run the following in your UNIX terminal:
 
 ```shell
