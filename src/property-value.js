@@ -33,9 +33,9 @@
  * @property {string} swingHor.default
  * @property {string} swingHor.full - Swing in full range
  * @property {string} swingHor.fixedLeft - Fixed in leftmost position (1/5)
- * @property {string} swingHor.fixedMidLeft - Fixed in middle-left postion (2/5)
+ * @property {string} swingHor.fixedMidLeft - Fixed in middle-left position (2/5)
  * @property {string} swingHor.fixedMid - Fixed in middle position (3/5)
- * @property {string} swingHor.fixedMidRight - Fixed in middle-right postion (4/5)
+ * @property {string} swingHor.fixedMidRight - Fixed in middle-right position (4/5)
  * @property {string} swingHor.fixedRight - Fixed in rightmost position (5/5)
  * @property {string} swingHor.fullAlt - Swing in full range (seems to be same as full)
  * @property {string} swingVert.default

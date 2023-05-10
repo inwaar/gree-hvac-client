@@ -62,7 +62,7 @@ client.on('no_response', () => {
 | **mode** | _auto_, _cool_, _heat_, _dry_, _fan_only_|Operation mode |
 | **fanspeed** | _auto_, _low_, _mediumLow_, _medium_, _mediumHigh_, _high_ | Fan speed |
 | **swinghor** | _default_, _full_, _fixedLeft_, _fixedMidLeft_, _fixedMid_, _fixedMidRight_, _fixedRight_ | Horizontal Swing |
-| **swingvert** | _default_, _full_, _fixedTop_, _fixedMidTop_, _fixedMid_, _fixedMidBottom_, _fixedBottom_, _swingBottom_, _swingMidBottom_, _swingMid_, _swingMidTop_, _swingTop_ | Vetical swing |
+| **swingvert** | _default_, _full_, _fixedTop_, _fixedMidTop_, _fixedMid_, _fixedMidBottom_, _fixedBottom_, _swingBottom_, _swingMidBottom_, _swingMid_, _swingMidTop_, _swingTop_ | Vertical swing |
 | **power** | _off_, _on_ | Turn device on/off |
 | **health** | _off_, _on_ | Health ("Cold plasma") mode, only for devices equipped with "anion generator", which absorbs dust and kills bacteria |
 | **powersave** | _off_, _on_ | Power Saving mode |
@@ -477,9 +477,9 @@ Device properties value constants
 | swingHor.default | <code>string</code> |  |
 | swingHor.full | <code>string</code> | Swing in full range |
 | swingHor.fixedLeft | <code>string</code> | Fixed in leftmost position (1/5) |
-| swingHor.fixedMidLeft | <code>string</code> | Fixed in middle-left postion (2/5) |
+| swingHor.fixedMidLeft | <code>string</code> | Fixed in middle-left position (2/5) |
 | swingHor.fixedMid | <code>string</code> | Fixed in middle position (3/5) |
-| swingHor.fixedMidRight | <code>string</code> | Fixed in middle-right postion (4/5) |
+| swingHor.fixedMidRight | <code>string</code> | Fixed in middle-right position (4/5) |
 | swingHor.fixedRight | <code>string</code> | Fixed in rightmost position (5/5) |
 | swingHor.fullAlt | <code>string</code> | Swing in full range (seems to be same as full) |
 | swingVert.default | <code>string</code> |  |
