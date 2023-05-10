@@ -1,5 +1,8 @@
 # Gree HVAC client
 
+![NPM status](https://img.shields.io/npm/v/gree-hvac-client)
+![Github Actions status](https://img.shields.io/github/actions/workflow/status/inwaar/gree-hvac-client/release.yml?label=release)
+
 A client for communicating with Gree air conditioners.
 
 ## Requirements
