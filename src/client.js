@@ -331,7 +331,7 @@ class Client extends EventEmitter {
      * client.setProperty('temperature', 25);
      */
     async setProperty(property, value) {
-        let properties = {};
+        const properties = {};
         properties[property] = value;
         return this.setProperties(properties);
     }
@@ -563,8 +563,8 @@ class Client extends EventEmitter {
     _handleStatusResponse(pack) {
         clearTimeout(this._statusTimeoutRef);
 
-        let oldProperties = clone(this._properties);
-        let newProperties = {};
+        const oldProperties = clone(this._properties);
+        const newProperties = {};
         pack.cols.forEach((col, i) => {
             newProperties[col] = pack.dat[i];
             this._properties[col] = pack.dat[i];
@@ -590,7 +590,7 @@ class Client extends EventEmitter {
      * @private
      */
     _handleUpdateConfirmResponse(pack) {
-        let updatedProperties = {};
+        const updatedProperties = {};
         pack.opt.forEach((opt, i) => {
             const value = 'val' in pack ? pack.val : pack.p;
             this._properties[opt] = updatedProperties[opt] = value[i];
