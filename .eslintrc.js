@@ -24,6 +24,13 @@ module.exports = {
                 'jsdoc/require-returns-description': 'off',
                 'jsdoc/check-property-names': 'off',
                 'jsdoc/sort-tags': 'error',
+                'jsdoc/tag-lines': [
+                    'error',
+                    'any',
+                    {
+                        startLines: 1,
+                    },
+                ],
             },
         },
     ],

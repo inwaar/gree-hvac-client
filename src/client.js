@@ -460,23 +460,27 @@ class Client extends EventEmitter {
 
         // If package type is response to handshake
         if (pack.t === 'dev') {
-            return await this._handleHandshakeResponse(pack);
+            await this._handleHandshakeResponse(pack);
+            return;
         }
 
         if (this._cid) {
             // If package type is binding confirmation
             if (pack.t === 'bindok') {
-                return this._handleBindingConfirmationResponse(pack);
+                this._handleBindingConfirmationResponse(pack);
+                return;
             }
 
             // If package type is device status
             if (pack.t === 'dat') {
-                return this._handleStatusResponse(pack);
+                this._handleStatusResponse(pack);
+                return;
             }
 
             // If package type is response, update device properties
             if (pack.t === 'res') {
-                return this._handleUpdateConfirmResponse(pack);
+                this._handleUpdateConfirmResponse(pack);
+                return;
             }
         }
 

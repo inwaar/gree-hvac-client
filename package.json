@@ -21,9 +21,9 @@
   "devDependencies": {
     "eslint": ">=8.27.0",
     "eslint-config-prettier": "^8.6.0",
-    "eslint-plugin-jsdoc": "^40.0.0",
+    "eslint-plugin-jsdoc": "^43.2.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "jsdoc-to-markdown": "8.0.0",
+    "jsdoc-to-markdown": "9.0.2",
     "mocha": "^10.2.0",
     "prettier": "^2.8.0",
     "semantic-release": "^20.1.0"
