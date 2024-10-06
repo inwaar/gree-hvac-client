@@ -14,7 +14,6 @@
  * @property {number} pollingInterval=3000 - Device properties polling interval
  * @property {number} pollingTimeout=1000 - Device properties polling timeout, emits `no_response` events in case of no response from HVAC device for a status request
  * @property {boolean} debug=false - Trace debug information
- * @property {number} encryptionVersion=1 - The encryption method to use: 1 AES-ECB; 2: AES-GCM
  */
 const CLIENT_OPTIONS = {
     host: '192.168.1.255',
@@ -25,7 +24,6 @@ const CLIENT_OPTIONS = {
     pollingInterval: 3000,
     pollingTimeout: 1000,
     debug: false,
-    encryptionVersion: 1,
 };
 
 module.exports = {

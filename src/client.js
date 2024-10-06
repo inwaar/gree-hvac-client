@@ -5,7 +5,7 @@ const EventEmitter = require('events');
 const diff = require('object-diff');
 const clone = require('clone');
 
-const { EncryptionService, EncryptionServiceGCM } = require('./encryption-service');
+const { EncryptionService } = require('./encryption-service');
 const { PROPERTY } = require('./property');
 const { PROPERTY_VALUE } = require('./property-value');
 const { CLIENT_OPTIONS } = require('./client-options');
@@ -111,6 +111,14 @@ class Client extends EventEmitter {
         this._socketTimeoutRef = null;
 
         /**
+         * Bind response timeout reference
+         *
+         * @type {number|null}
+         * @private
+         */
+        this._bindTimeoutRef = null;
+
+        /**
          * Status polling interval reference
          *
          * @type {number|null}
@@ -146,29 +154,12 @@ class Client extends EventEmitter {
          * @private
          */
         this._options = { ...CLIENT_OPTIONS, ...options };
-        
+
         /**
-         * Encryption service based on encryption version.
          * @type {EncryptionService}
          * @private
          */
-        switch (this._options.encryptionVersion) {
-            case 1:
-                this._encryptionService = new EncryptionService();
-                break;
-            case 2:
-                this._encryptionService = new EncryptionServiceGCM();
-                break;
-            default:
-                this._encryptionService = new EncryptionService();
-        }
-        
-        /**
-         * Needed for scan request handling
-         * @type {EncryptionService}
-         * @private
-         */
-        this._encryptionServiceV1 = new EncryptionService();
+        this._encryptionService = new EncryptionService();
 
         /**
          * @private
@@ -377,17 +368,18 @@ class Client extends EventEmitter {
      * @private
      */
     async _sendBindRequest() {
+        const encrypted = this._encryptionService.encrypt({
+            mac: this._cid,
+            t: 'bind',
+            uid: 0,
+        });
         await this._socketSend({
             cid: 'app',
             i: 1,
             t: 'pack',
             uid: 0,
-            pack: this._encryptionService.encrypt({
-                mac: this._cid,
-                t: 'bind',
-                uid: 0,
-            }),
-            tag: this._encryptionService.getTag(),
+            pack: encrypted.payload,
+            tag: encrypted.tag,
         });
     }
 
@@ -434,13 +426,14 @@ class Client extends EventEmitter {
      */
     async _sendRequest(message) {
         this._trace('OUT.MSG', message, this._encryptionService.getKey());
+        const encrypted = this._encryptionService.encrypt(message);
         await this._socketSend({
             cid: 'app',
             i: 0,
             t: 'pack',
             uid: 0,
-            pack: this._encryptionService.encrypt(message),
-            tag: this._encryptionService.getTag(),
+            pack: encrypted.payload,
+            tag: encrypted.tag,
         });
     }
 
@@ -475,14 +468,7 @@ class Client extends EventEmitter {
         this._trace('IN.MSG', message);
 
         // Extract encrypted package from message using device key (if available)
-        let pack;
-        if (!this._cid) {
-            //scan responses are always on v1
-            pack = this._encryptionServiceV1.decrypt(message);
-        } else {
-            //use set encryption method
-            pack = this._encryptionService.decrypt(message);
-        }
+        const pack = this._unpack(message);
 
         // If package type is response to handshake
         if (pack.t === 'dev') {
@@ -493,7 +479,7 @@ class Client extends EventEmitter {
         if (this._cid) {
             // If package type is binding confirmation
             if (pack.t === 'bindok') {
-                this._handleBindingConfirmationResponse(pack);
+                this._handleBindingConfirmationResponse();
                 return;
             }
 
@@ -553,21 +539,23 @@ class Client extends EventEmitter {
      */
     async _handleHandshakeResponse(message) {
         this._cid = message.cid || message.mac;
+
         await this._sendBindRequest();
+        this._bindTimeoutRef = setTimeout(async () => {
+            await this._sendBindRequest();
+        }, 500);
     }
 
     /**
      * Handle device binding confirmation response
      *
-     * @param pack
      * @fires Client#connect
      * @private
      */
-    async _handleBindingConfirmationResponse(pack) {
+    async _handleBindingConfirmationResponse() {
         this._trace('SOCKET', 'Connected to device', this._options.host);
         clearTimeout(this._socketTimeoutRef);
-
-        this._encryptionService.setKey(pack.key);
+        clearTimeout(this._bindTimeoutRef);
 
         await this._requestStatus();
         if (this._options.poll) {
