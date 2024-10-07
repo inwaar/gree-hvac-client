@@ -3,10 +3,6 @@ on:
   workflow_call:
   pull_request:
   push:
-    branches:
-      - ci
-    # branches-ignore:
-    #   - master
 
 jobs:
   check:
