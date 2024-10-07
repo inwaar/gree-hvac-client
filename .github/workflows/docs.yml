@@ -18,4 +18,5 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run docs
-      - run: "git diff --exit-code README.md > /dev/null || (echo fail: README.md is outdated, forget to run 'npm run docs'? && false)"
+      - name: Check README.md is up to date (forget to run 'npm run docs'?)
+        uses: NathanielHill/fail-if-changes@9e6ed6b
