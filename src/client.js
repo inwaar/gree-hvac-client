@@ -23,7 +23,6 @@ const {
 
 /**
  * Control GREE HVAC device by getting and setting its properties
- * Test
  *
  * @augments EventEmitter
  */
