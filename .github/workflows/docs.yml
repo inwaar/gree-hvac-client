@@ -1,4 +1,4 @@
-name: autofix.ci
+name: autofix
 on:
   workflow_call:
   pull_request:
@@ -8,11 +8,8 @@ on:
     # branches-ignore:
     #   - master
 
-permissions:
-  contents: read
-
 jobs:
-  autofix:
+  docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +18,4 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run docs
-      - run: npm run lint --fix
-
-      - uses: autofix-ci/action@dd55f44df8f7cdb7a6bf74c78677eb8acd40cd0a
+      - run: "git diff --exit-code README.md > /dev/null || echo fail: README.md is outdated, forget to run 'npm run docs'?"
