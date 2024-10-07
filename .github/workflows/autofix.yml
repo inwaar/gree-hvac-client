@@ -5,8 +5,8 @@ on:
   push:
     branches:
       - ci
-    branches-ignore:
-      - master
+    # branches-ignore:
+    #   - master
 
 permissions:
   contents: read
