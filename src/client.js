@@ -5,7 +5,7 @@ const EventEmitter = require('events');
 const diff = require('object-diff');
 const clone = require('clone');
 
-const { EncryptionService } = require('./encryption-service');
+const { EncryptionService, EncryptionServiceGCM } = require('./encryption-service');
 const { PROPERTY } = require('./property');
 const { PROPERTY_VALUE } = require('./property-value');
 const { CLIENT_OPTIONS } = require('./client-options');
@@ -140,18 +140,35 @@ class Client extends EventEmitter {
         this._transformer = new PropertyTransformer();
 
         /**
-         * @type {EncryptionService}
-         * @private
-         */
-        this._encryptionService = new EncryptionService();
-
-        /**
          * Client options
          *
          * @type {CLIENT_OPTIONS}
          * @private
          */
         this._options = { ...CLIENT_OPTIONS, ...options };
+        
+        /**
+         * Encryption service based on encryption version.
+         * @type {EncryptionService}
+         * @private
+         */
+        switch (this._options.encryptionVersion) {
+            case 1:
+                this._encryptionService = new EncryptionService();
+                break;
+            case 2:
+                this._encryptionService = new EncryptionServiceGCM();
+                break;
+            default:
+                this._encryptionService = new EncryptionService();
+        }
+        
+        /**
+         * Needed for scan request handling
+         * @type {EncryptionService}
+         * @private
+         */
+        this._encryptionServiceV1 = new EncryptionService();
 
         /**
          * @private
@@ -370,6 +387,7 @@ class Client extends EventEmitter {
                 t: 'bind',
                 uid: 0,
             }),
+            tag: this._encryptionService.getTag(),
         });
     }
 
@@ -422,6 +440,7 @@ class Client extends EventEmitter {
             t: 'pack',
             uid: 0,
             pack: this._encryptionService.encrypt(message),
+            tag: this._encryptionService.getTag(),
         });
     }
 
@@ -456,7 +475,14 @@ class Client extends EventEmitter {
         this._trace('IN.MSG', message);
 
         // Extract encrypted package from message using device key (if available)
-        const pack = this._unpack(message);
+        let pack;
+        if (!this._cid) {
+            //scan responses are always on v1
+            pack = this._encryptionServiceV1.decrypt(message);
+        } else {
+            //use set encryption method
+            pack = this._encryptionService.decrypt(message);
+        }
 
         // If package type is response to handshake
         if (pack.t === 'dev') {
