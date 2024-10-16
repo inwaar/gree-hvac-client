@@ -3,7 +3,7 @@ module.exports = {
     env: {
         node: true,
         es2021: true,
-        mocha: true,
+        jest: true,
     },
     plugins: ['jsdoc', 'prettier'],
     overrides: [
