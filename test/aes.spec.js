@@ -138,8 +138,6 @@ describe('AES encryption', () => {
             `);
         feedClient(message5.payload);
 
-        // await jest.advanceTimersByTimeAsync(500);
-
         // 6) client sends STATUS request
         expect(clientEncrypt.mock.calls[1][0]).toMatchInlineSnapshot(`
                 {
