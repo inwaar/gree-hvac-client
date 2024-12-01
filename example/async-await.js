@@ -3,6 +3,7 @@ const Gree = require('gree-hvac-client');
 const client = new Gree.Client({
     host: '192.168.7.60',
     autoConnect: false,
+    poll: false,
 });
 
 (async () => {

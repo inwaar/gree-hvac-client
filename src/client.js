@@ -20,6 +20,8 @@ const {
     ClientConnectTimeoutError,
     ClientCancelConnectError,
 } = require('./errors');
+const { createLogger } = require('./logger');
+const { randomUUID } = require('crypto');
 
 /**
  * Control GREE HVAC device by getting and setting its properties
@@ -103,6 +105,12 @@ class Client extends EventEmitter {
         this._socket = null;
 
         /**
+         * @type {number}
+         * @private
+         */
+        this._reconnectAttempt = 1;
+
+        /**
          * Socket connection timeout reference
          *
          * @type {number|null}
@@ -156,29 +164,22 @@ class Client extends EventEmitter {
         this._options = { ...CLIENT_OPTIONS, ...options };
 
         /**
+         * @private
+         */
+        this._logger;
+        this.setDebug(this._options.debug);
+
+        /**
          * @type {EncryptionService}
          * @private
          */
-        this._encryptionService = new EncryptionService();
+        this._encryptionService = new EncryptionService(this._logger);
 
-        /**
-         * @private
-         */
-        this._trace = function () {
-            if (!this._options.debug) {
-                return;
-            }
-
-            console.debug(
-                '>>> cid:' + this._cid + ': ' + new Date().toLocaleString()
-            );
-            console.debug.apply(null, arguments);
-        };
-
-        this._trace('OPTIONS', this._options);
+        this._logger.info('Init', { options: this._options });
 
         if (this._options.autoConnect) {
             process.nextTick(() => {
+                this._logger.info('Auto-connect');
                 this.connect().catch(error => this.emit('error', error));
             });
         }
@@ -192,6 +193,8 @@ class Client extends EventEmitter {
      * @fires Client#error
      */
     connect() {
+        this._logger.info('Connecting');
+
         return new Promise((resolve, reject) => {
             this.once('connect', resolve);
             this.once('disconnect', () => {
@@ -200,9 +203,10 @@ class Client extends EventEmitter {
 
             this._socket = dgram.createSocket('udp4');
             this._socket.on('message', message => {
-                this._handleResponse(message).catch(error =>
-                    this.emit('error', error)
-                );
+                this._handleResponse(message).catch(error => {
+                    this._logger.error('Response handle error', error);
+                    this.emit('error', error);
+                });
             });
 
             this._socket.bind(() => {
@@ -221,13 +225,17 @@ class Client extends EventEmitter {
         this._dispose();
 
         try {
-            this._encryptionService = new EncryptionService();
+            this._encryptionService = new EncryptionService(this._logger);
 
+            this._logger.info('Scan start', {
+                attempt: this._reconnectAttempt,
+            });
             await this._socketSend({ t: 'scan' });
-            await this._reconnect();
+
+            await this._scheduleReconnect();
             this.emit('error', new ClientConnectTimeoutError());
         } catch (err) {
-            this._reconnect();
+            this._scheduleReconnect();
             throw err;
         }
     }
@@ -237,11 +245,18 @@ class Client extends EventEmitter {
      *
      * @private
      */
-    _reconnect() {
+    _scheduleReconnect() {
         return new Promise(resolve => {
             this._socketTimeoutRef = setTimeout(() => {
-                this._trace('SOCKET', 'Reconnecting...');
-                this._initialize().catch(error => this.emit('error', error));
+                this._logger.warn('Connect timeout, reconnect', {
+                    timeout: this._options.connectTimeout,
+                });
+                this._reconnectAttempt++;
+
+                this._initialize().catch(error => {
+                    this.emit('error', error);
+                    this._logger.error('Initialize error', error);
+                });
                 resolve();
             }, this._options.connectTimeout);
         });
@@ -254,11 +269,14 @@ class Client extends EventEmitter {
      * @fires Client#disconnect
      */
     disconnect() {
+        this._logger.info('Disconnecting');
+
         this._dispose();
 
         return new Promise((resolve, reject) => {
             if (this._socket) {
                 this._socket.close(() => {
+                    this._logger.info('Disconnected');
                     this.emit('disconnect');
                     resolve();
                 });
@@ -314,6 +332,8 @@ class Client extends EventEmitter {
      */
     setProperties(properties) {
         const vendorProperties = this._transformer.toVendor(properties);
+
+        this._logger.info('Update request');
         return this._sendRequest({
             opt: Object.keys(vendorProperties),
             p: Object.values(vendorProperties),
@@ -361,20 +381,38 @@ class Client extends EventEmitter {
      * @param enable {Boolean}
      */
     setDebug(enable) {
-        this._options.debug = !!enable;
+        this._createLogger(enable ? 'debug' : 'error');
+    }
+
+    /**
+     * Create logger
+     *
+     * @param level {string}
+     * @private
+     */
+    _createLogger(level) {
+        this._logger = createLogger(level).child({
+            service: 'client',
+            sid: randomUUID(),
+        });
+        this._encryptionService = new EncryptionService(this._logger);
     }
 
     /**
      * Send binding request to device
      *
+     * @param {number} attempt
      * @private
      */
-    async _sendBindRequest() {
+    async _sendBindRequest(attempt) {
+        this._logger.info('Binding start', { attempt });
+
         const encrypted = this._encryptionService.encrypt({
             mac: this._cid,
             t: 'bind',
             uid: 0,
         });
+
         await this._socketSend({
             cid: 'app',
             i: 1,
@@ -393,7 +431,7 @@ class Client extends EventEmitter {
      */
     _socketSend(request) {
         return new Promise((resolve, reject) => {
-            this._trace('SOCKET.SEND', request);
+            this._logger.debug('Socket send', { request });
             const toSend = Buffer.from(JSON.stringify(request));
 
             if (this._socket) {
@@ -427,7 +465,8 @@ class Client extends EventEmitter {
      * @private
      */
     async _sendRequest(message) {
-        this._trace('OUT.MSG', message, this._encryptionService.getKey());
+        this._logger.debug('Send request', { request: message });
+
         const encrypted = this._encryptionService.encrypt(message);
         await this._socketSend({
             cid: 'app',
@@ -445,6 +484,8 @@ class Client extends EventEmitter {
      * @private
      */
     async _requestStatus() {
+        this._logger.info('Status request');
+
         await this._sendRequest({
             cols: this._transformer.arrayToVendor(Object.keys(PROPERTY)),
             mac: this._cid,
@@ -452,6 +493,10 @@ class Client extends EventEmitter {
         });
 
         this._statusTimeoutRef = setTimeout(() => {
+            this._logger.warn('Status request timeout', {
+                timeout: this._options.pollingTimeout,
+            });
+
             this._properties = {};
             this.emit('no_response', this);
         }, this._options.pollingTimeout);
@@ -467,7 +512,7 @@ class Client extends EventEmitter {
     async _handleResponse(buffer) {
         const message = this._parse(buffer);
 
-        this._trace('IN.MSG', message);
+        this._logger.debug('Handle response', { request: message });
 
         // Extract encrypted package from message using device key (if available)
         const pack = this._unpack(message);
@@ -525,9 +570,7 @@ class Client extends EventEmitter {
      */
     _unpack(message) {
         try {
-            const pack = this._encryptionService.decrypt(message);
-            this._trace('IN.MSG.UNPACK', pack);
-            return pack;
+            return this._encryptionService.decrypt(message);
         } catch (error) {
             throw new ClientMessageUnpackError(error, { message });
         }
@@ -537,15 +580,20 @@ class Client extends EventEmitter {
      * Handle device handshake response
      *
      * @param message
+     * @param {number} timeout
      * @private
      */
-    async _handleHandshakeResponse(message) {
+    async _handleHandshakeResponse(message, timeout = 500) {
         this._cid = message.cid || message.mac;
 
-        await this._sendBindRequest();
+        this._logger = this._logger.child({ cid: this._cid });
+        this._logger.info('Scan success');
+
+        await this._sendBindRequest(1);
         this._bindTimeoutRef = setTimeout(async () => {
-            await this._sendBindRequest();
-        }, 500);
+            this._logger.warn('Binding attempt timed out', { timeout });
+            await this._sendBindRequest(2);
+        }, timeout);
     }
 
     /**
@@ -555,12 +603,17 @@ class Client extends EventEmitter {
      * @private
      */
     async _handleBindingConfirmationResponse() {
-        this._trace('SOCKET', 'Connected to device', this._options.host);
+        this._logger.info('Binding success (connected)', {
+            host: this._options.host,
+        });
+
         clearTimeout(this._socketTimeoutRef);
         clearTimeout(this._bindTimeoutRef);
 
         await this._requestStatus();
         if (this._options.poll) {
+            this._logger.info('Schedule status polling');
+
             this._statusIntervalRef = setInterval(
                 () =>
                     this._requestStatus().catch(error =>
@@ -581,6 +634,8 @@ class Client extends EventEmitter {
      * @private
      */
     _handleStatusResponse(pack) {
+        this._logger.info('Status response');
+
         clearTimeout(this._statusTimeoutRef);
 
         const oldProperties = clone(this._properties);
@@ -610,6 +665,8 @@ class Client extends EventEmitter {
      * @private
      */
     _handleUpdateConfirmResponse(pack) {
+        this._logger.info('Update response');
+
         const updatedProperties = {};
         pack.opt.forEach((opt, i) => {
             const value = 'val' in pack ? pack.val : pack.p;

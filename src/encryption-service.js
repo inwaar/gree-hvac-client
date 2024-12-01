@@ -15,7 +15,7 @@ const crypto = require('crypto');
  * @private
  */
 class EncryptionService {
-    constructor() {
+    constructor(logger) {
         /**
          * @private
          */
@@ -37,6 +37,13 @@ class EncryptionService {
          * @private
          */
         this._bindAttempt = 1;
+
+        /**
+         * @private
+         */
+        this._logger = logger.child({
+            service: 'encryptor',
+        });
     }
 
     /**
@@ -54,11 +61,14 @@ class EncryptionService {
      * @returns {object}
      */
     decrypt(input) {
-        const payload = this._activeCipher.decrypt(input);
+        const decrypted = this._activeCipher.decrypt(input);
+        const payload = decrypted.payload;
 
         if (payload.t === 'bindok') {
             this._activeCipher.setKey(payload.key);
         }
+
+        this._logger.debug('Decrypt', { input, output: decrypted });
 
         return payload;
     }
@@ -78,7 +88,10 @@ class EncryptionService {
             this._bindAttempt++;
         }
 
-        return this._activeCipher.encrypt(output);
+        const encrypted = this._activeCipher.encrypt(output);
+        this._logger.debug('Encrypt', { input: output, output: encrypted });
+
+        return encrypted;
     }
 }
 
@@ -123,7 +136,13 @@ class EcbCipher {
     decrypt(input) {
         const decipher = crypto.createDecipheriv('aes-128-ecb', this._key, '');
         const str = decipher.update(input.pack, 'base64', 'utf8');
-        return JSON.parse(str + decipher.final('utf8'));
+        const payload = JSON.parse(str + decipher.final('utf8'));
+
+        return {
+            payload,
+            cipher: 'ecb',
+            key: this._key,
+        };
     }
 
     /**
@@ -204,7 +223,13 @@ class GcmCipher {
             decipher.setAuthTag(decTag);
         }
         const str = decipher.update(input.pack, 'base64', 'utf8');
-        return JSON.parse(str + decipher.final('utf8'));
+        const payload = JSON.parse(str + decipher.final('utf8'));
+
+        return {
+            payload,
+            cipher: 'gcm',
+            key: this._key,
+        };
     }
 
     /**
