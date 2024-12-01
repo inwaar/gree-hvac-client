@@ -111,6 +111,14 @@ class Client extends EventEmitter {
         this._socketTimeoutRef = null;
 
         /**
+         * Bind response timeout reference
+         *
+         * @type {number|null}
+         * @private
+         */
+        this._bindTimeoutRef = null;
+
+        /**
          * Status polling interval reference
          *
          * @type {number|null}
@@ -140,18 +148,18 @@ class Client extends EventEmitter {
         this._transformer = new PropertyTransformer();
 
         /**
-         * @type {EncryptionService}
-         * @private
-         */
-        this._encryptionService = new EncryptionService();
-
-        /**
          * Client options
          *
          * @type {CLIENT_OPTIONS}
          * @private
          */
         this._options = { ...CLIENT_OPTIONS, ...options };
+
+        /**
+         * @type {EncryptionService}
+         * @private
+         */
+        this._encryptionService = new EncryptionService();
 
         /**
          * @private
@@ -360,16 +368,18 @@ class Client extends EventEmitter {
      * @private
      */
     async _sendBindRequest() {
+        const encrypted = this._encryptionService.encrypt({
+            mac: this._cid,
+            t: 'bind',
+            uid: 0,
+        });
         await this._socketSend({
             cid: 'app',
             i: 1,
             t: 'pack',
             uid: 0,
-            pack: this._encryptionService.encrypt({
-                mac: this._cid,
-                t: 'bind',
-                uid: 0,
-            }),
+            pack: encrypted.payload,
+            tag: encrypted.tag,
         });
     }
 
@@ -416,12 +426,14 @@ class Client extends EventEmitter {
      */
     async _sendRequest(message) {
         this._trace('OUT.MSG', message, this._encryptionService.getKey());
+        const encrypted = this._encryptionService.encrypt(message);
         await this._socketSend({
             cid: 'app',
             i: 0,
             t: 'pack',
             uid: 0,
-            pack: this._encryptionService.encrypt(message),
+            pack: encrypted.payload,
+            tag: encrypted.tag,
         });
     }
 
@@ -467,7 +479,7 @@ class Client extends EventEmitter {
         if (this._cid) {
             // If package type is binding confirmation
             if (pack.t === 'bindok') {
-                this._handleBindingConfirmationResponse(pack);
+                this._handleBindingConfirmationResponse();
                 return;
             }
 
@@ -527,21 +539,23 @@ class Client extends EventEmitter {
      */
     async _handleHandshakeResponse(message) {
         this._cid = message.cid || message.mac;
+
         await this._sendBindRequest();
+        this._bindTimeoutRef = setTimeout(async () => {
+            await this._sendBindRequest();
+        }, 500);
     }
 
     /**
      * Handle device binding confirmation response
      *
-     * @param pack
      * @fires Client#connect
      * @private
      */
-    async _handleBindingConfirmationResponse(pack) {
+    async _handleBindingConfirmationResponse() {
         this._trace('SOCKET', 'Connected to device', this._options.host);
         clearTimeout(this._socketTimeoutRef);
-
-        this._encryptionService.setKey(pack.key);
+        clearTimeout(this._bindTimeoutRef);
 
         await this._requestStatus();
         if (this._options.poll) {

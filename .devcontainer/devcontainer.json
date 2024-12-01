@@ -12,7 +12,7 @@
 			"extensions": [
 				"GitHub.vscode-github-actions",
 				"dbaeumer.vscode-eslint",
-				"hbenl.vscode-mocha-test-adapter"
+				"Orta.vscode-jest"
 			]
 		}
 	},
