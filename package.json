@@ -8,6 +8,10 @@
     "docs": "jsdoc2md -t README.hbs src/*.js  > README.md; echo",
     "semantic-release": "semantic-release"
   },
+  "files": [
+    "src",
+    "index.js"
+  ],
   "keywords": [],
   "author": "Igor Starovierov <igor.decler@gmail.com>",
   "license": "GPL-3.0",
