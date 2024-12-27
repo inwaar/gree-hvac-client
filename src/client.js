@@ -221,6 +221,8 @@ class Client extends EventEmitter {
         this._dispose();
 
         try {
+            this._encryptionService = new EncryptionService();
+
             await this._socketSend({ t: 'scan' });
             await this._reconnect();
             this.emit('error', new ClientConnectTimeoutError());

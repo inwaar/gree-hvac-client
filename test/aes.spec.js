@@ -1,6 +1,7 @@
 const dgram = require('dgram');
 
 const { Client } = require('../src/client');
+const { ClientConnectTimeoutError } = require('../src/errors');
 
 const device = require('./support/device');
 const {
@@ -19,7 +20,8 @@ describe('AES encryption', () => {
     let feedClient;
     let clientEncrypt;
     let clientSocketSend;
-    let done, connected;
+    let statusUpdated, connected;
+    let errors;
 
     beforeEach(async () => {
         ecb = new EcbCipher();
@@ -37,33 +39,41 @@ describe('AES encryption', () => {
             autoConnect: false,
         });
 
-        done = new Promise(resolve => SUT.once('update', resolve));
-        SUT.once('error', console.error);
+        statusUpdated = new Promise(resolve => SUT.once('update', resolve));
 
         clientSocketSend = jest.spyOn(SUT, '_socketSend');
         clientEncrypt = jest.spyOn(EncryptionService.prototype, 'encrypt');
+
+        errors = [];
+        SUT.on('error', e => errors.push(e));
 
         connected = SUT.connect();
     });
 
     afterEach(async () => {
-        await connected;
-        await done;
         await SUT.disconnect();
         jest.restoreAllMocks();
     });
 
-    it('should get device status with ECB', async () => {
-        // 1) client sends SCAN
-        expect(clientSocketSend.mock.calls[0][0]).toMatchInlineSnapshot(`
+    describe('Update status', () => {
+        afterEach(async () => {
+            expect(errors).toHaveLength(0);
+
+            await connected;
+            await statusUpdated;
+        });
+
+        it('should get device status with ECB', async () => {
+            // 1) client sends SCAN
+            expect(clientSocketSend.mock.calls[0][0]).toMatchInlineSnapshot(`
                 {
                   "t": "scan",
                 }
             `);
 
-        // 2) device send DEV to the client as a response to SCAN
-        const message2 = device.scan(ecb);
-        expect(message2).toMatchInlineSnapshot(`
+            // 2) device send DEV to the client as a response to SCAN
+            const message2 = device.scan(ecb);
+            expect(message2).toMatchInlineSnapshot(`
                 {
                   "cipher": "EcbCipher",
                   "key": "a3K8Bx%2r8Y7#xDh",
@@ -93,17 +103,17 @@ describe('AES encryption', () => {
                   "tag": undefined,
                 }
             `);
-        feedClient(message2.payload);
+            feedClient(message2.payload);
 
-        // 3) client sends BIND request, attempt 1 ECB
-        expect(clientEncrypt.mock.calls[0][0]).toMatchInlineSnapshot(`
+            // 3) client sends BIND request, attempt 1 ECB
+            expect(clientEncrypt.mock.calls[0][0]).toMatchInlineSnapshot(`
                 {
                   "mac": "-CLIENT-ID-",
                   "t": "bind",
                   "uid": 0,
                 }
             `);
-        expect(clientEncrypt.mock.results[0].value).toMatchInlineSnapshot(`
+            expect(clientEncrypt.mock.results[0].value).toMatchInlineSnapshot(`
                 {
                   "cipher": "ecb",
                   "key": "a3K8Bx%2r8Y7#xDh",
@@ -111,11 +121,11 @@ describe('AES encryption', () => {
                 }
             `);
 
-        await jest.advanceTimersByTimeAsync(100);
+            await jest.advanceTimersByTimeAsync(100);
 
-        // 5) device sends BINDOK in response to BIND
-        const message5 = device.bind(ecb);
-        expect(message5).toMatchInlineSnapshot(`
+            // 5) device sends BINDOK in response to BIND
+            const message5 = device.bind(ecb);
+            expect(message5).toMatchInlineSnapshot(`
                 {
                   "cipher": "EcbCipher",
                   "key": "---BINDED-KEY---",
@@ -136,10 +146,10 @@ describe('AES encryption', () => {
                   "tag": undefined,
                 }
             `);
-        feedClient(message5.payload);
+            feedClient(message5.payload);
 
-        // 6) client sends STATUS request
-        expect(clientEncrypt.mock.calls[1][0]).toMatchInlineSnapshot(`
+            // 6) client sends STATUS request
+            expect(clientEncrypt.mock.calls[1][0]).toMatchInlineSnapshot(`
                 {
                   "cols": [
                     "Pow",
@@ -164,7 +174,7 @@ describe('AES encryption', () => {
                   "t": "status",
                 }
             `);
-        expect(clientEncrypt.mock.results[1].value).toMatchInlineSnapshot(`
+            expect(clientEncrypt.mock.results[1].value).toMatchInlineSnapshot(`
                 {
                   "cipher": "ecb",
                   "key": "---BINDED-KEY---",
@@ -172,9 +182,9 @@ describe('AES encryption', () => {
                 }
             `);
 
-        // 7) device sends DAT in response to STATUS
-        const message7 = device.status(ecb);
-        expect(message7).toMatchInlineSnapshot(`
+            // 7) device sends DAT in response to STATUS
+            const message7 = device.status(ecb);
+            expect(message7).toMatchInlineSnapshot(`
                 {
                   "cipher": "EcbCipher",
                   "key": "---BINDED-KEY---",
@@ -233,20 +243,20 @@ describe('AES encryption', () => {
                 }
             `);
 
-        feedClient(message7.payload);
-    });
+            feedClient(message7.payload);
+        });
 
-    it('should get device status with GCM', async () => {
-        // 1) client sends SCAN
-        expect(clientSocketSend.mock.calls[0][0]).toMatchInlineSnapshot(`
+        it('should get device status with GCM', async () => {
+            // 1) client sends SCAN
+            expect(clientSocketSend.mock.calls[0][0]).toMatchInlineSnapshot(`
                 {
                   "t": "scan",
                 }
             `);
 
-        // 2) device send DEV to the client as a response to SCAN
-        const message2 = device.scan(ecb);
-        expect(message2).toMatchInlineSnapshot(`
+            // 2) device send DEV to the client as a response to SCAN
+            const message2 = device.scan(ecb);
+            expect(message2).toMatchInlineSnapshot(`
                 {
                   "cipher": "EcbCipher",
                   "key": "a3K8Bx%2r8Y7#xDh",
@@ -276,17 +286,17 @@ describe('AES encryption', () => {
                   "tag": undefined,
                 }
             `);
-        feedClient(message2.payload);
+            feedClient(message2.payload);
 
-        // 3) client sends BIND request, attempt 1 ECB
-        expect(clientEncrypt.mock.calls[0][0]).toMatchInlineSnapshot(`
+            // 3) client sends BIND request, attempt 1 ECB
+            expect(clientEncrypt.mock.calls[0][0]).toMatchInlineSnapshot(`
                 {
                   "mac": "-CLIENT-ID-",
                   "t": "bind",
                   "uid": 0,
                 }
             `);
-        expect(clientEncrypt.mock.results[0].value).toMatchInlineSnapshot(`
+            expect(clientEncrypt.mock.results[0].value).toMatchInlineSnapshot(`
                 {
                   "cipher": "ecb",
                   "key": "a3K8Bx%2r8Y7#xDh",
@@ -294,17 +304,17 @@ describe('AES encryption', () => {
                 }
             `);
 
-        await jest.advanceTimersByTimeAsync(500);
+            await jest.advanceTimersByTimeAsync(500);
 
-        // 4) client sends BIND request, attempt 2 GCM
-        expect(clientEncrypt.mock.calls[1][0]).toMatchInlineSnapshot(`
+            // 4) client sends BIND request, attempt 2 GCM
+            expect(clientEncrypt.mock.calls[1][0]).toMatchInlineSnapshot(`
                 {
                   "mac": "-CLIENT-ID-",
                   "t": "bind",
                   "uid": 0,
                 }
             `);
-        expect(clientEncrypt.mock.results[1].value).toMatchInlineSnapshot(`
+            expect(clientEncrypt.mock.results[1].value).toMatchInlineSnapshot(`
                 {
                   "cipher": "gcm",
                   "key": "{yxAHAY_Lm6pbC/<",
@@ -313,9 +323,9 @@ describe('AES encryption', () => {
                 }
             `);
 
-        // 5) device sends BINDOK in response to BIND
-        const message5 = device.bind(gcm);
-        expect(message5).toMatchInlineSnapshot(`
+            // 5) device sends BINDOK in response to BIND
+            const message5 = device.bind(gcm);
+            expect(message5).toMatchInlineSnapshot(`
                 {
                   "cipher": "GcmCipher",
                   "key": "---BINDED-KEY---",
@@ -337,10 +347,10 @@ describe('AES encryption', () => {
                 }
             `);
 
-        feedClient(message5.payload);
+            feedClient(message5.payload);
 
-        // 6) client sends STATUS request
-        expect(clientEncrypt.mock.calls[2][0]).toMatchInlineSnapshot(`
+            // 6) client sends STATUS request
+            expect(clientEncrypt.mock.calls[2][0]).toMatchInlineSnapshot(`
                 {
                   "cols": [
                     "Pow",
@@ -365,7 +375,7 @@ describe('AES encryption', () => {
                   "t": "status",
                 }
             `);
-        expect(clientEncrypt.mock.results[2].value).toMatchInlineSnapshot(`
+            expect(clientEncrypt.mock.results[2].value).toMatchInlineSnapshot(`
                 {
                   "cipher": "gcm",
                   "key": "---BINDED-KEY---",
@@ -374,9 +384,9 @@ describe('AES encryption', () => {
                 }
             `);
 
-        // 7) device sends DAT in response to STATUS
-        const message7 = device.status(gcm);
-        expect(message7).toMatchInlineSnapshot(`
+            // 7) device sends DAT in response to STATUS
+            const message7 = device.status(gcm);
+            expect(message7).toMatchInlineSnapshot(`
                 {
                   "cipher": "GcmCipher",
                   "key": "---BINDED-KEY---",
@@ -435,6 +445,22 @@ describe('AES encryption', () => {
                 }
             `);
 
-        feedClient(message7.payload);
+            feedClient(message7.payload);
+        });
+    });
+
+    it('should reset encryption cipher state on reconnect', async () => {
+        feedClient(device.scan(ecb).payload);
+
+        // device timed out BINDOK in response to BIND and the client emits timeout error
+        await jest.advanceTimersByTimeAsync(5000);
+        expect(errors).toHaveLength(1);
+        expect(errors[0]).toBeInstanceOf(ClientConnectTimeoutError);
+
+        feedClient(device.scan(ecb).payload);
+
+        // the client decrypt and handle scan packed correctly without error
+        await jest.advanceTimersByTimeAsync(1);
+        expect(errors).toHaveLength(1);
     });
 });
