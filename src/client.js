@@ -8,7 +8,7 @@ const clone = require('clone');
 const { EncryptionService } = require('./encryption-service');
 const { PROPERTY } = require('./property');
 const { PROPERTY_VALUE } = require('./property-value');
-const { CLIENT_OPTIONS } = require('./client-options');
+const { CLIENT_OPTIONS, createOptions } = require('./client-options');
 const { PropertyTransformer } = require('./property-transformer');
 const {
     ClientError,
@@ -161,7 +161,7 @@ class Client extends EventEmitter {
          * @type {CLIENT_OPTIONS}
          * @private
          */
-        this._options = { ...CLIENT_OPTIONS, ...options };
+        this._options = createOptions(options);
 
         /**
          * @private
@@ -376,12 +376,13 @@ class Client extends EventEmitter {
     }
 
     /**
-     * Set debug level
+     * Override log level to `debug`
      *
      * @param enable {Boolean}
+     * @deprecated Use the client `logLevel` option instead
      */
     setDebug(enable) {
-        this._createLogger(enable ? 'debug' : 'error');
+        this._createLogger(enable ? 'debug' : this._options.logLevel);
     }
 
     /**

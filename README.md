@@ -153,7 +153,7 @@ Control GREE HVAC device by getting and setting its properties
     * [.setProperties(properties)](#Client+setProperties) ⇒ <code>Promise</code>
     * [.setProperty(property, value)](#Client+setProperty) ⇒ <code>Promise</code>
     * [.getDeviceId()](#Client+getDeviceId) ⇒ <code>string</code> \| <code>null</code>
-    * [.setDebug(enable)](#Client+setDebug)
+    * ~~[.setDebug(enable)](#Client+setDebug)~~
     * ["connect"](#Client+event_connect)
     * ["success" (updated, properties)](#Client+event_success)
     * ["update" (updated, properties)](#Client+event_update)
@@ -263,8 +263,10 @@ Returns devices MAC-address
 **Kind**: instance method of [<code>Client</code>](#Client)  
 <a name="Client+setDebug"></a>
 
-### client.setDebug(enable)
-Set debug level
+### ~~client.setDebug(enable)~~
+***Deprecated***
+
+Override log level to `debug`
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 
@@ -435,7 +437,8 @@ Client options
 | poll | <code>boolean</code> | <code>true</code> | Poll device properties |
 | pollingInterval | <code>number</code> | <code>3000</code> | Device properties polling interval |
 | pollingTimeout | <code>number</code> | <code>1000</code> | Device properties polling timeout, emits `no_response` events in case of no response from HVAC device for a status request |
-| debug | <code>boolean</code> | <code>false</code> | Trace debug information |
+| logLevel | <code>boolean</code> | <code>error</code> | Logging level (debug, info, warn, error) |
+| debug | <code>boolean</code> | <code>false</code> | Override logLevel to debug, deprecated, use logLevel option |
 
 <a name="PROPERTY_VALUE"></a>
 

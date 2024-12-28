@@ -13,7 +13,8 @@
  * @property {boolean} poll=true - Poll device properties
  * @property {number} pollingInterval=3000 - Device properties polling interval
  * @property {number} pollingTimeout=1000 - Device properties polling timeout, emits `no_response` events in case of no response from HVAC device for a status request
- * @property {boolean} debug=false - Trace debug information
+ * @property {boolean} logLevel=error - Logging level (debug, info, warn, error)
+ * @property {boolean} debug=false - Override logLevel to debug, deprecated, use logLevel option
  */
 const CLIENT_OPTIONS = {
     host: '192.168.1.255',
@@ -23,9 +24,41 @@ const CLIENT_OPTIONS = {
     poll: true,
     pollingInterval: 3000,
     pollingTimeout: 1000,
+    logLevel: 'error',
     debug: false,
 };
 
+/**
+ * Build effective options
+ *
+ * @param {CLIENT_OPTIONS} options
+ * @returns {CLIENT_OPTIONS}
+ * @private
+ */
+const createOptions = options => {
+    const envOptions = filterOutUndefined({
+        host: process.env.GREE_HVAC_HOST,
+        port: process.env.GREE_HVAC_PORT,
+        connectTimeout: process.env.GREE_HVAC_CONNECT_TIMEOUT,
+        autoConnect: process.env.GREE_HVAC_AUTO_CONNECT,
+        poll: process.env.GREE_HVAC_POLL,
+        pollingInterval: process.env.GREE_HVAC_POLLING_INTERVAL,
+        pollingTimeout: process.env.GREE_HVAC_POLLLING_TIMEOUT,
+        logLevel: process.env.GREE_HVAC_LOG_LEVEL,
+        debug: process.env.GREE_HVAC_DEBUG,
+    });
+
+    return {
+        ...CLIENT_OPTIONS,
+        ...envOptions,
+        ...options,
+    };
+};
+
+const filterOutUndefined = obj =>
+    Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+
 module.exports = {
     CLIENT_OPTIONS,
+    createOptions,
 };

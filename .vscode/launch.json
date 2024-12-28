@@ -13,7 +13,8 @@
       ],
       "program": "${file}",
       "env": {
-        "NODE_ENV": "development"
+        "NODE_ENV": "development",
+        "GREE_HVAC_LOG_LEVEL": "debug"
       },
       "internalConsoleOptions": "openOnSessionStart"
     }
