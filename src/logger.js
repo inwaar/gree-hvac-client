@@ -7,7 +7,8 @@ const formats = {
     print: winston.format.printf(info => {
         const time = `[${info.timestamp} ${info.ms}]`;
         const service = info.service.toUpperCase();
-        const line = `${time} ${info.level} ${service}:${info.version}>`;
+        const sid = info.sid.substr(0, 8);
+        const line = `${time} ${info.level} ${service}:${info.version}/${sid}>`;
 
         if (Object.keys(info.metadata).length > 0) {
             const meta = util.inspect(info.metadata, {
