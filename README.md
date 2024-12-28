@@ -438,7 +438,7 @@ Client options
 | poll | <code>boolean</code> | <code>true</code> | Poll device properties |
 | pollingInterval | <code>number</code> | <code>3000</code> | Device properties polling interval |
 | pollingTimeout | <code>number</code> | <code>1000</code> | Device properties polling timeout, emits `no_response` events in case of no response from HVAC device for a status request |
-| logLevel | <code>boolean</code> | <code>error</code> | Logging level (debug, info, warn, error) |
+| logLevel | <code>string</code> | <code>&quot;error&quot;</code> | Logging level (debug, info, warn, error) |
 | debug | <code>boolean</code> | <code>false</code> | Override logLevel to debug, deprecated, use logLevel option |
 
 <a name="PROPERTY_VALUE"></a>

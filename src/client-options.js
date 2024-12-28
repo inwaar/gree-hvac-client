@@ -13,7 +13,7 @@
  * @property {boolean} poll=true - Poll device properties
  * @property {number} pollingInterval=3000 - Device properties polling interval
  * @property {number} pollingTimeout=1000 - Device properties polling timeout, emits `no_response` events in case of no response from HVAC device for a status request
- * @property {boolean} logLevel=error - Logging level (debug, info, warn, error)
+ * @property {string} logLevel=error - Logging level (debug, info, warn, error)
  * @property {boolean} debug=false - Override logLevel to debug, deprecated, use logLevel option
  */
 const CLIENT_OPTIONS = {
