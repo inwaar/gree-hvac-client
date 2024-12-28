@@ -7,7 +7,7 @@ A client for communicating with Gree air conditioners.
 
 ## Requirements
 
-- NodeJS (>=14)
+- NodeJS (>=16)
 
 ## Installation
 
@@ -267,6 +267,7 @@ Returns devices MAC-address
 ***Deprecated***
 
 Override log level to `debug`
+Use the client `logLevel` option instead
 
 **Kind**: instance method of [<code>Client</code>](#Client)  
 

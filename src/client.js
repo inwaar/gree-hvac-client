@@ -377,9 +377,10 @@ class Client extends EventEmitter {
 
     /**
      * Override log level to `debug`
+     * Use the client `logLevel` option instead
      *
      * @param enable {Boolean}
-     * @deprecated Use the client `logLevel` option instead
+     * @deprecated
      */
     setDebug(enable) {
         this._createLogger(enable ? 'debug' : this._options.logLevel);
