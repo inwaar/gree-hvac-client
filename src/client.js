@@ -302,6 +302,9 @@ class Client extends EventEmitter {
         if (this._statusTimeoutRef) {
             clearTimeout(this._statusTimeoutRef);
         }
+        if (this._bindTimeoutRef) {
+            clearTimeout(this._bindTimeoutRef);
+        }
     }
 
     /**
